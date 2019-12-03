@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import (
     QApplication, QLabel, QLineEdit, QMainWindow, QPushButton, QVBoxLayout
 )
 
+import qcrash.api as qcrash
+
 
 class MainWindow(QMainWindow):
 
@@ -45,9 +47,22 @@ class MainWindow(QMainWindow):
         self.label.repaint()
 
 
+def setup_qcrash():
+
+    qcrash.get_application_log = lambda: 'application log\nline1\nline2'
+    qcrash.get_system_information = lambda: 'system info here'
+
+    github = qcrash.backends.GithubBackend('tmontes', 'qtcrashme')
+    email = qcrash.backends.EmailBackend('tiago.montes@gmail.com', 'qtcrashme')
+    qcrash.install_backend([github, email])
+
+    qcrash.install_except_hook()
+
+
 def main():
 
     app = QApplication(sys.argv)
+    setup_qcrash()
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())
